@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colonization Flashcard Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .flashcard {
+            background: #333;
+            color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: background 0.3s, color 0.3s;
+        }
+        .show {
+            background: #fff;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Colonization Flashcard Game</h1>
+        <div id="flashcards"></div>
+    </div>
+    <script>
+        const words = [
+            { term: "Colonization", definition: "Control of a place by another country." },
+            { term: "Imperialism", definition: "Strong countries take weaker ones." },
+            { term: "Colony", definition: "A land controlled by a foreign power." },
+            { term: "Settler", definition: "Person who moves to a new place." },
+            { term: "Exploitation", definition: "Using people or resources unfairly." },
+            { term: "Indigenous", definition: "Original people of a place." },
+            { term: "Resistance", definition: "Fighting against control." },
+            { term: "Assimilation", definition: "Forcing people to adopt another culture." },
+            { term: "Revolt", definition: "Rebellion against the rulers." },
+            { term: "Missionary", definition: "Person spreading religion in new lands." },
+            { term: "Annexation", definition: "Adding land to a country." },
+            { term: "Oppression", definition: "Cruel or unfair treatment." },
+            { term: "Decolonization", definition: "Process of gaining independence." },
+            { term: "Neocolonialism", definition: "Indirect control over a former colony." },
+            { term: "Sovereignty", definition: "Full control over a country." },
+            { term: "Colonial Rule", definition: "Governance by a foreign power." },
+            { term: "Expropriation", definition: "Taking property from native people." },
+            { term: "Trade Monopoly", definition: "Exclusive control of trade by colonizers." },
+            { term: "Cultural Suppression", definition: "Forcing local people to abandon their culture." },
+            { term: "Autonomy", definition: "The ability to govern oneself." }
+        ];
+        
+        const flashcardsContainer = document.getElementById("flashcards");
+        
+        words.forEach(word => {
+            const card = document.createElement("div");
+            card.classList.add("flashcard");
+            card.innerText = "Click to reveal";
+            
+            let isRevealed = false;
+            
+            card.onclick = () => {
+                if (isRevealed) {
+                    card.innerText = "Click to reveal";
+                    card.classList.remove("show");
+                } else {
+                    card.innerText = `${word.term}\n\n${word.definition}`;
+                    card.classList.add("show");
+                }
+                isRevealed = !isRevealed;
+            };
+            
+            flashcardsContainer.appendChild(card);
+        });
+    </script>
+</body>
+</html>
