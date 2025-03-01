@@ -8,41 +8,86 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
+            background-color: #2f4f4f;
             padding: 20px;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
-            background: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        .flashcard {
-            background: #333;
-            color: white;
-            padding: 20px;
-            margin: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            user-select: none;
+        .flashcards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 35px;
             position: relative;
-            transition: background 0.3s, color 0.3s;
         }
-        .show {
-            background: #fff;
+        .card {
+            width: 150px;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 1.5s ease-in-out;
+        }
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease-in-out;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            padding: 10px;
+        }
+        .card-front {
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            color: white;
+            font-weight: bold;
+        }
+        .card-back {
+            background: white;
             color: black;
+            transform: rotateY(180deg);
+        }
+        .shuffle-button {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #ff9900;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.1s ease;
+        }
+        .shuffle-button:active {
+            transform: scale(0.9);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Colonization Flashcard Game</h1>
-        <div id="flashcards"></div>
+        <h1 style="color: white;">Colonization Flashcard Game</h1>
+        <button class="shuffle-button" onclick="shuffleCards()">Shuffle Cards</button>
+        <div class="flashcards" id="flashcards"></div>
     </div>
     <script>
-        const words = [
+        let words = [
             { term: "Colonization", definition: "Control of a place by another country." },
             { term: "Imperialism", definition: "Strong countries take weaker ones." },
             { term: "Colony", definition: "A land controlled by a foreign power." },
@@ -52,41 +97,70 @@
             { term: "Resistance", definition: "Fighting against control." },
             { term: "Assimilation", definition: "Forcing people to adopt another culture." },
             { term: "Revolt", definition: "Rebellion against the rulers." },
-            { term: "Missionary", definition: "Person spreading religion in new lands." },
-            { term: "Annexation", definition: "Adding land to a country." },
-            { term: "Oppression", definition: "Cruel or unfair treatment." },
-            { term: "Decolonization", definition: "Process of gaining independence." },
-            { term: "Neocolonialism", definition: "Indirect control over a former colony." },
-            { term: "Sovereignty", definition: "Full control over a country." },
-            { term: "Colonial Rule", definition: "Governance by a foreign power." },
-            { term: "Expropriation", definition: "Taking property from native people." },
-            { term: "Trade Monopoly", definition: "Exclusive control of trade by colonizers." },
-            { term: "Cultural Suppression", definition: "Forcing local people to abandon their culture." },
-            { term: "Autonomy", definition: "The ability to govern oneself." }
+            { term: "Missionary", definition: "Person spreading religion in new lands." }
         ];
         
         const flashcardsContainer = document.getElementById("flashcards");
         
-        words.forEach(word => {
-            const card = document.createElement("div");
-            card.classList.add("flashcard");
-            card.innerText = "Click to reveal";
+        function shuffleCards() {
+            const cards = document.querySelectorAll(".card");
             
-            let isRevealed = false;
+            // Move all cards to the center
+            cards.forEach(card => {
+                card.style.transform = `translate(0px, 0px) scale(0.5)`;
+            });
             
-            card.onclick = () => {
-                if (isRevealed) {
-                    card.innerText = "Click to reveal";
-                    card.classList.remove("show");
-                } else {
-                    card.innerText = `${word.term}\n\n${word.definition}`;
-                    card.classList.add("show");
-                }
-                isRevealed = !isRevealed;
-            };
-            
-            flashcardsContainer.appendChild(card);
-        });
+            setTimeout(() => {
+                words = words.sort(() => Math.random() - 0.5);
+                renderCards();
+            }, 1000);
+        }
+        
+        function renderCards() {
+            flashcardsContainer.innerHTML = "";
+            words.forEach((word, index) => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                
+                const cardInner = document.createElement("div");
+                cardInner.classList.add("card-inner");
+                
+                const cardFront = document.createElement("div");
+                cardFront.classList.add("card-front");
+                cardFront.innerText = "Click to Reveal";
+                
+                const cardBack = document.createElement("div");
+                cardBack.classList.add("card-back");
+                cardBack.innerText = "";
+                
+                let state = 0;
+                
+                card.addEventListener("click", () => {
+                    if (state === 0) {
+                        card.classList.add("flipped");
+                        cardBack.innerHTML = `<strong>${word.term}</strong>`;
+                        state = 1;
+                    } else if (state === 1) {
+                        cardBack.innerHTML = `${word.definition}`;
+                        state = 2;
+                    } else {
+                        card.classList.remove("flipped");
+                        state = 0;
+                    }
+                });
+                
+                cardInner.appendChild(cardFront);
+                cardInner.appendChild(cardBack);
+                card.appendChild(cardInner);
+                flashcardsContainer.appendChild(card);
+                
+                setTimeout(() => {
+                    card.style.transform = `translate(0px, 0px) rotate(0deg)`;
+                }, 1500);
+            });
+        }
+        
+        renderCards();
     </script>
 </body>
 </html>
